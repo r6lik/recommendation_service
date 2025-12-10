@@ -22,7 +22,7 @@ services:
     image: ankane/pghero
     container_name: recommendations_pghero
     environment:
-      DATABASE_URL: "database://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}"
+      DATABASE_URL: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}"
     ports:
       - "8080:8080"
     depends_on:
@@ -37,7 +37,7 @@ services:
       - "${REDIS_PORT}:6379"
     volumes:
       - redis_data:/data
-    command: cache-server --appendonly yes
+#    command: cache-server --appendonly yes
     healthcheck:
       test: ["CMD", "cache-cli", "ping"]
       interval: 10s
