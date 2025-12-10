@@ -1,0 +1,96 @@
+version: '3'
+
+dotenv: [ '.env' ]
+
+vars:
+  MIGRATIONS_PATH: ./migrations
+  DOCS_PATH: ./docs
+
+tasks:
+  migrate:create:
+    desc: Create a new migration
+    cmds:
+      - migrate create -ext sql -dir {{.MIGRATIONS_PATH}} -seq {{.CLI_ARGS}}
+
+  migrate:up:
+    desc: Run database migrations up
+    cmds:
+      - migrate -path {{.MIGRATIONS_PATH}} -database "postgres://{{.POSTGRES_USER}}:{{.POSTGRES_PASSWORD}}@{{.POSTGRES_HOST}}:{{.POSTGRES_PORT}}/{{.POSTGRES_DB}}?sslmode=disable" up
+
+  migrate:down:
+    desc: Run database migrations down
+    cmds:
+      - migrate -path {{.MIGRATIONS_PATH}} -database "postgres://{{.POSTGRES_USER}}:{{.POSTGRES_PASSWORD}}@{{.POSTGRES_HOST}}:{{.POSTGRES_PORT}}/{{.POSTGRES_DB}}?sslmode=disable" down
+
+  migrate:force:
+    desc: Force migration version
+    cmds:
+      - migrate -path {{.MIGRATIONS_PATH}} -database "postgres://{{.POSTGRES_USER}}:{{.POSTGRES_PASSWORD}}@{{.POSTGRES_HOST}}:{{.POSTGRES_PORT}}/{{.POSTGRES_DB}}?sslmode=disable" force {{.CLI_ARGS}}
+
+  migrate:version:
+    desc: Print current migration version
+    cmds:
+      - migrate -path {{.MIGRATIONS_PATH}} -database "postgres://{{.POSTGRES_USER}}:{{.POSTGRES_PASSWORD}}@{{.POSTGRES_HOST}}:{{.POSTGRES_PORT}}/{{.POSTGRES_DB}}?sslmode=disable" version
+
+  migrate:drop:
+    desc: Drop everything in database
+    cmds:
+      - migrate -path {{.MIGRATIONS_PATH}} -database "postgres://{{.POSTGRES_USER}}:{{.POSTGRES_PASSWORD}}@{{.POSTGRES_HOST}}:{{.POSTGRES_PORT}}/{{.POSTGRES_DB}}?sslmode=disable" drop
+
+  swagger:generate:
+    desc: Generate Swagger documentation
+    cmds:
+      - swag init -g cmd/api/main.go -o {{.DOCS_PATH}} --parseDependency --parseInternal
+
+  swagger:fmt:
+    desc: Format Swagger annotations
+    cmds:
+      - swag fmt
+
+  swagger:clean:
+    desc: Clean generated Swagger files
+    cmds:
+      - rm -rf {{.DOCS_PATH}}
+
+  swagger:regen:
+    desc: Clean and regenerate Swagger documentation
+    cmds:
+      - task: swagger:clean
+      - task: swagger:generate
+
+  dev:
+    desc: Run application in development mode
+    cmds:
+      - go run cmd/api/main.go
+
+  dev:watch:
+    desc: Run application with hot reload (requires air)
+    cmds:
+      - air
+
+  build:
+    desc: Build application
+    cmds:
+      - go build -o bin/garcus cmd/api/main.go
+
+  test:
+    desc: Run tests
+    cmds:
+      - go test -v ./...
+
+  test:cover:
+    desc: Run tests with coverage
+    cmds:
+      - go test -v -coverprofile=coverage.out ./...
+      - go tool cover -html=coverage.out -o coverage.html
+
+  lint:
+    desc: Run golangci-lint
+    cmds:
+      - golangci-lint run
+
+  generate:all:
+    desc: Generate all (swagger, mocks, etc)
+    cmds:
+      - task: swagger:generate
+      - echo "All generated successfully!"

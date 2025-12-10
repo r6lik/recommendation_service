@@ -1,3 +1,4 @@
+// entry point to start program.
 package main
 
 func main() {
