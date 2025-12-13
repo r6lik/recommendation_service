@@ -28,6 +28,13 @@ const (
 )
 
 const (
+	TimeOfDayMorning   TimeOfDay = "MORNING"
+	TimeOfDayAfternoon TimeOfDay = "AFTERNOON"
+	TimeOfDayEvening   TimeOfDay = "EVENING"
+	TimeOfDayNight     TimeOfDay = "NIGHT"
+)
+
+const (
 	DeviceMobile  DeviceType = "MOBILE"
 	DeviceDesktop DeviceType = "DESKTOP"
 	DeviceTablet  DeviceType = "TABLET"
@@ -74,7 +81,7 @@ type Context struct {
 	TimeOfDay   TimeOfDay
 	DayOfWeek   string
 	Region      string
-	DeviceType  DeviceType
+	Device      DeviceType
 	UserSegment UserSegment
 	IsHoliday   bool
 }
